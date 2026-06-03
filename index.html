@@ -503,12 +503,43 @@
     // ── If Brevo URL is set, use fetch; otherwise show success directly ──
     if (BREVO_FORM_URL !== 'YOUR_BREVO_FORM_ACTION_URL_HERE') {
       try {
-        const formData = new FormData();
-        formData.append('EMAIL', email);
-        if (name) formData.append('FIRSTNAME', name);
-        await fetch(BREVO_FORM_URL, { method: 'POST', body: formData, mode: 'no-cors' });
-      } catch(e) {
-        // no-cors won't throw on network success
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = BREVO_FORM_URL;
+  form.target = '_blank';
+
+  const emailField = document.createElement('input');
+  emailField.type = 'hidden';
+  emailField.name = 'EMAIL';
+  emailField.value = email;
+
+  const nameField = document.createElement('input');
+  nameField.type = 'hidden';
+  nameField.name = 'NOMBRE';
+  nameField.value = name;
+
+  const localeField = document.createElement('input');
+  localeField.type = 'hidden';
+  localeField.name = 'locale';
+  localeField.value = 'es';
+
+  const htmlTypeField = document.createElement('input');
+  htmlTypeField.type = 'hidden';
+  htmlTypeField.name = 'html_type';
+  htmlTypeField.value = 'simple';
+
+  form.appendChild(emailField);
+  form.appendChild(nameField);
+  form.appendChild(localeField);
+  form.appendChild(htmlTypeField);
+
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+} catch (e) {
+  console.error(e);
+}
       }
     }
 
