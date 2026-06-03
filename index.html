@@ -475,18 +475,13 @@
 </div>
 
 <script>
-  // ── REPLACE THIS URL WITH YOUR BREVO FORM ACTION URL ──
-  // After creating your Brevo form, paste the action URL below:
-  const BREVO_FORM_URL = "https://18cf1811.sibforms.com/serve/MUIFANu8eBdvT1svVSab_weLRn5GZwfj0e7rOwk_Zhd1kOt4-89RoRbAgsoKNfA_8ihuWveU8WHi9wlRT-a_XOnONAOX2XpyfqqvEMg6xt6UpKNemG6nJZSRalqdC8Iruc1WBeuSEngIFQ-N8eLNGNxI9VdytTD71Iju8hwvEHtX_ecLzwE8Fz4hcaESBCKpLjltpIjzOSi1PAMC5A==";
-
   function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
-  async function handleSubscribe() {
+  function handleSubscribe() {
     const name  = document.getElementById('nameInput').value.trim();
     const email = document.getElementById('emailInput').value.trim();
-    const btn   = document.getElementById('subscribeBtn');
     const err   = document.getElementById('errorMsg');
 
     err.style.display = 'none';
@@ -497,58 +492,26 @@
       return;
     }
 
-    btn.disabled = true;
-    btn.querySelector('span').textContent = 'Un momento…';
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://18cf1811.sibforms.com/serve/MUIFANu8eBdvT1svVSab_weLRn5GZwfj0e7rOwk_Zhd1kOt4-89RoRbAgsoKNfA_8ihuWveU8WHi9wlRT-a_XOnONAOX2XpyfqqvEMg6xt6UpKNemG6nJZSRalqdC8Iruc1WBeuSEngIFQ-N8eLNGNxI9VdytTD71Iju8hwvEHtX_ecLzwE8Fz4hcaESBCKpLjltpIjzOSi1PAMC5A==';
+    form.target = '_blank';
 
-    // ── If Brevo URL is set, use fetch; otherwise show success directly ──
-    if (BREVO_FORM_URL !== 'YOUR_BREVO_FORM_ACTION_URL_HERE') {
-      try {
-  const form = document.createElement('form');
-  form.method = 'POST';
-  form.action = BREVO_FORM_URL;
-  form.target = '_blank';
+    form.innerHTML = `
+      <input type="hidden" name="NOMBRE" value="${name}">
+      <input type="hidden" name="EMAIL" value="${email}">
+      <input type="hidden" name="email_address_check" value="">
+      <input type="hidden" name="locale" value="es">
+      <input type="hidden" name="html_type" value="simple">
+    `;
 
-  const emailField = document.createElement('input');
-  emailField.type = 'hidden';
-  emailField.name = 'EMAIL';
-  emailField.value = email;
+    document.body.appendChild(form);
+    form.submit();
 
-  const nameField = document.createElement('input');
-  nameField.type = 'hidden';
-  nameField.name = 'NOMBRE';
-  nameField.value = name;
-
-  const localeField = document.createElement('input');
-  localeField.type = 'hidden';
-  localeField.name = 'locale';
-  localeField.value = 'es';
-
-  const htmlTypeField = document.createElement('input');
-  htmlTypeField.type = 'hidden';
-  htmlTypeField.name = 'html_type';
-  htmlTypeField.value = 'simple';
-
-  form.appendChild(emailField);
-  form.appendChild(nameField);
-  form.appendChild(localeField);
-  form.appendChild(htmlTypeField);
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-
-} catch (e) {
-  console.error(e);
-}
-      }
-    }
-
-    // Show success
     document.getElementById('formContainer').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
   }
 
-  // Allow Enter key on inputs
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter') handleSubscribe();
   });
