@@ -457,7 +457,7 @@
 
     <div class="success-msg" id="successMsg">
       <div class="check">✦</div>
-      <p>El camino ha comenzado.<br><strong>Revisa tu correo</strong> para confirmar tu suscripción.</p>
+      <p>El camino ha comenzado.<br><strong>Tu suscripción ha sido registrada.</strong></p>
     </div>
 
     <p class="privacy-note">Sin spam. Puedes darte de baja en cualquier momento.</p>
@@ -475,41 +475,76 @@
 </div>
 
 <script>
+  const BREVO_FORM_URL = 'https://18cf1811.sibforms.com/serve/MUIFANu8eBdvT1svVSab_weLRn5GZwfj0e7rOwk_Zhd1kOt4-89RoRbAgsoKNfA_8ihuWveU8WHi9wlRT-a_XOnONAOX2XpyfqqvEMg6xt6UpKNemG6nJZSRalqdC8Iruc1WBeuSEngIFQ-N8eLNGNxI9VdytTD71Iju8hwvEHtX_ecLzwE8Fz4hcaESBCKpLjltpIjzOSi1PAMC5A==';
+
   function validateEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
 
+  function addHiddenField(form, name, value) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  }
+
   function handleSubscribe() {
-    const name  = document.getElementById('nameInput').value.trim();
-    const email = document.getElementById('emailInput').value.trim();
-    const err   = document.getElementById('errorMsg');
+    const nameInput  = document.getElementById('nameInput');
+    const emailInput = document.getElementById('emailInput');
+    const formContainer = document.getElementById('formContainer');
+    const successMsg = document.getElementById('successMsg');
+    const err = document.getElementById('errorMsg');
+
+    const name  = nameInput.value.trim();
+    const email = emailInput.value.trim();
 
     err.style.display = 'none';
 
     if (!validateEmail(email)) {
       err.style.display = 'block';
-      document.getElementById('emailInput').focus();
+      emailInput.focus();
       return;
+    }
+
+    let iframe = document.getElementById('brevoHiddenFrame');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.name = 'brevoHiddenFrame';
+      iframe.id = 'brevoHiddenFrame';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
     }
 
     const form = document.createElement('form');
     form.method = 'POST';
-    form.action = 'https://18cf1811.sibforms.com/serve/MUIFANu8eBdvT1svVSab_weLRn5GZwfj0e7rOwk_Zhd1kOt4-89RoRbAgsoKNfA_8ihuWveU8WHi9wlRT-a_XOnONAOX2XpyfqqvEMg6xt6UpKNemG6nJZSRalqdC8Iruc1WBeuSEngIFQ-N8eLNGNxI9VdytTD71Iju8hwvEHtX_ecLzwE8Fz4hcaESBCKpLjltpIjzOSi1PAMC5A==';
+    form.action = BREVO_FORM_URL;
     form.target = 'brevoHiddenFrame';
+    form.style.display = 'none';
 
-    form.innerHTML = `
-      <input type="hidden" name="NOMBRE" value="${name}">
-      <input type="hidden" name="EMAIL" value="${email}">
-      <input type="hidden" name="email_address_check" value="">
-      <input type="hidden" name="locale" value="es">
-      <input type="hidden" name="html_type" value="simple">
-    `;
+    addHiddenField(form, 'NOMBRE', name);
+    addHiddenField(form, 'EMAIL', email);
+    addHiddenField(form, 'email_address_check', '');
+    addHiddenField(form, 'locale', 'es');
+    addHiddenField(form, 'html_type', 'simple');
 
     document.body.appendChild(form);
     form.submit();
 
-    document.getElementById('formContainer').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
+    setTimeout(() => {
+      form.remove();
+    }, 1000);
+
+    nameInput.value = '';
+    emailInput.value = '';
+
+    formContainer.style.display = 'none';
+    successMsg.style.display = 'block';
+
+    setTimeout(() => {
+      successMsg.style.display = 'none';
+      formContainer.style.display = 'flex';
+    }, 5000);
   }
 
   document.addEventListener('keydown', function(e) {
